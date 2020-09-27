@@ -10,9 +10,4 @@ import net.yl.rpc.registry.Registry;
 public class RegistryConfig {
 
 
-
-    public static Registry getRegistry() {
-        return new DefaultRegistry();
-    }
-
 }

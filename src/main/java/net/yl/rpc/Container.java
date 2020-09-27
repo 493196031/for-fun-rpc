@@ -1,7 +1,6 @@
 package net.yl.rpc;
 
 import net.yl.rpc.config.Configuration;
-import net.yl.rpc.registry.Registry;
 
 /**
  * @author yulei0
@@ -11,13 +10,12 @@ public class Container {
 
     private Server server;
 
-    private Registry registry;
-
     private Configuration configuration;
 
-
     public void start() {
+        // 加载配置信息
         configuration.load();
+        // 启动服务器
         server.start();
     }
 

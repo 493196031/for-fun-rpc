@@ -2,7 +2,6 @@ package net.yl.rpc.registry;
 
 import net.yl.rpc.proxy.ObjectName;
 import net.yl.rpc.proxy.ObjectProxy;
-import net.yl.rpc.proxy.RegistryException;
 
 /**
  * @author yulei0
