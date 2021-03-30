@@ -21,4 +21,10 @@ public class ReflectUtils {
         return ReflectionUtils.invokeMethod(method, target, params);
     }
 
+    public static <T> T newInstance(Class<T> clazz) throws IllegalAccessException, InstantiationException {
+        return clazz.newInstance();
+    }
+    public static Object newInstance(String clazz) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+        return newInstance(Class.forName(clazz));
+    }
 }

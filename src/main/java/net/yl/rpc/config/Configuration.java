@@ -1,45 +1,103 @@
 package net.yl.rpc.config;
 
 
-import net.yl.rpc.proxy.ObjectProxy;
-import net.yl.rpc.registry.Registry;
+import net.yl.rpc.Constants;
+import net.yl.rpc.LifeCycle;
+import net.yl.rpc.container.Container;
+import net.yl.rpc.util.ReflectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * @author yulei0
  * @date 2020/9/24
  */
-public class Configuration {
+public class Configuration implements LifeCycle {
 
-    private RegistryConfig registryConfig;
+    private Container container;
 
-    private List<RemoteObjectConfig> remoteObjectConfig;
+    private String configFile = "application.properties";
 
-    public void load(){
+    private Properties configProp = new Properties();
+
+    private DefaultPropertyMerger merger = new DefaultPropertyMerger();
+
+    public Configuration() {
+
+    }
+
+    public Configuration(String configFile) {
+        this.configFile = configFile;
+    }
+
+    private void load() throws IllegalAccessException, InstantiationException, IOException, ClassNotFoundException {
         // 加载所有配置，并初始化
+        configProp.load(readFromClasspath(configFile));
+        merger.merge(configProp);
+
+        // 实例化容器
+        String containerClazz = configProp.getProperty(Constants.containerKey);
+        container = (Container) ReflectUtils.newInstance(containerClazz);
+
+        container.setConfig(this);
+
     }
 
-    public RegistryConfig getRegistryConfig() {
-        return registryConfig;
+    private InputStream readFromClasspath(String configFile) {
+        return Configuration.class.getResourceAsStream("/" + configFile);
     }
 
-    public List<RemoteObjectConfig> getRemoteObjectConfigs() {
-        return null;
-    }
-
-    public List<ObjectProxy> registryRemoteObjects(){
-        List<ObjectProxy> objectProxies = new ArrayList<>();
-        for(RemoteObjectConfig remoteObjectConfig : getRemoteObjectConfigs()) {
-            ObjectProxy remoteObject = remoteObjectConfig.bind(getRegistry());
-            objectProxies.add(remoteObject);
+    @Override
+    public void init() {
+        try {
+            load();
+        } catch (Exception e) {
+            throw new IllegalStateException("容器类实例化失败", e);
         }
-        return objectProxies;
+
+        container.init();
     }
 
-    public Registry getRegistry() {
-        return null;
+    @Override
+    public void start() {
+        container.start();
+    }
+
+    @Override
+    public void stop() {
+        container.stop();
+    }
+
+    @Override
+    public void destroy() {
+        container.destroy();
+    }
+
+    public String getProperty(String key) {
+        return configProp.getProperty(key);
+    }
+
+    public String getProperty(String key, String defaultValue) {
+        return configProp.getProperty(key, defaultValue);
+    }
+
+    class DefaultPropertyMerger {
+
+
+        void merge(Properties properties) {
+            merge(properties, Constants.containerKey,
+                    "net.yl.rpc.container.SampleContainer");
+        }
+
+        void merge(Properties properties,
+                   String key, String defaultValue) {
+            if (properties.containsKey(key)) {
+                return;
+            } else {
+                properties.put(key, defaultValue);
+            }
+        }
     }
 }
