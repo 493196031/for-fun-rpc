@@ -37,11 +37,6 @@ public class SampleContainer implements Container{
     }
 
     @Override
-    public void setStartClass(Class<? extends LifeCycle> startClass) {
-        this.startClass = startClass;
-    }
-
-    @Override
     public void setConfig(Configuration config) {
         this.configuration = config;
     }
@@ -50,7 +45,11 @@ public class SampleContainer implements Container{
     @Override
     public void init() {
         // 生成Bean和注入关系
-        createBean(configuration.getProperty(Constants.containerConfigFileKey, defaultConfigFile));
+        String configFile = configuration.getProperty(
+                Constants.containerConfigFileKey, defaultConfigFile);
+        createBean(configFile);
+
+        this.startBean = getBean(startClass);
     }
 
     private void createBean(String configFile) {
@@ -61,10 +60,6 @@ public class SampleContainer implements Container{
 
     @Override
     public void start() {
-        LifeCycle startBean = getBean(startClass);
-        if (startBean == null) {
-            throw new IllegalStateException();
-        }
         startBean.start();
     }
 
