@@ -48,7 +48,13 @@ public class Server implements LifeCycle{
 
         server.start();
 
-        server.stop();
+        // 注册钩子
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                server.stop();
+            }
+        });
 
     }
 

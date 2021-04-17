@@ -7,6 +7,7 @@ import net.yl.rpc.LifeCycle;
  * @date 2021/3/29
  */
 public class RpcService implements LifeCycle {
+
     @Override
     public void init() {
 
