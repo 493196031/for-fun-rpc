@@ -1,9 +1,14 @@
 package net.yl.rpc.codec;
 
-public interface Codec<S,E> {
+import java.io.IOException;
 
-    E encode(S source);
+public interface Codec {
 
-    S decode(E encoded);
+    int jdk = 0;
+    int pb = 1;
+
+    <S> byte[] encode(S source) throws IOException;
+
+    <S> S decode(Class<S> clazz, byte[] encoded) throws IOException;
 
 }
